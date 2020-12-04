@@ -190,7 +190,7 @@ mod endpoint_tests {
             handle(server, rx).await.expect("Unable to handle request");
         });
 
-        let conn = SimulatedConnector { inner: client };
+        let conn = Connector { inner: client };
         let client = hyper::Client::builder().build(conn);
 
         let req = NextEventRequest.into_req()?;
@@ -220,7 +220,7 @@ mod endpoint_tests {
             handle(server, rx).await.expect("Unable to handle request");
         });
 
-        let conn = SimulatedConnector { inner: client };
+        let conn = Connector { inner: client };
         let client = hyper::Client::builder().build(conn);
 
         let req = EventCompletionRequest {
@@ -252,7 +252,7 @@ mod endpoint_tests {
             handle(server, rx).await.expect("Unable to handle request");
         });
 
-        let conn = SimulatedConnector { inner: client };
+        let conn = Connector { inner: client };
         let client = hyper::Client::builder().build(conn);
 
         let req = EventErrorRequest {

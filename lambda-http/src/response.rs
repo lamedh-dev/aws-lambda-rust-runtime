@@ -169,7 +169,7 @@ impl LambdaResponse {
 /// # Example
 ///
 /// ```rust
-/// use lambda_http::{Body, IntoResponse, Response};
+/// use netlify_lambda_http::{Body, IntoResponse, Response};
 ///
 /// assert_eq!(
 ///   "hello".into_response().body(),

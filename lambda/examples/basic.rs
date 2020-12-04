@@ -1,7 +1,7 @@
 // This example requires the following input to succeed:
 // { "command": "do something" }
 
-use lambda::{handler_fn, Context};
+use netlify_lambda::{handler_fn, Context};
 use serde::{Deserialize, Serialize};
 use simple_logger;
 
@@ -34,7 +34,7 @@ async fn main() -> Result<(), Error> {
     simple_logger::init_with_level(log::Level::Info)?;
 
     let func = handler_fn(my_handler);
-    lambda::run(func).await?;
+    netlify_lambda::run(func).await?;
     Ok(())
 }
 
