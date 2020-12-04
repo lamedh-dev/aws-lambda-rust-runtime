@@ -172,7 +172,7 @@ mod endpoint_tests {
     use super::{handle, set_origin};
     use crate::{
         requests::{EventCompletionRequest, EventErrorRequest, IntoRequest, NextEventRequest},
-        simulated::SimulatedConnector,
+        simulated::Connector,
         types::Diagnostic,
         Error,
     };

@@ -100,7 +100,10 @@ pub mod request;
 mod response;
 mod strmap;
 pub use crate::{body::Body, ext::RequestExt, response::IntoResponse, strmap::StrMap};
-use crate::{request::LambdaRequest, response::LambdaResponse};
+use crate::{
+    request::{LambdaRequest, RequestOrigin},
+    response::LambdaResponse,
+};
 use std::{
     future::Future,
     pin::Pin,
@@ -122,9 +125,9 @@ pub trait Handler: Sized {
     /// The type of Response this Handler will return
     type Response: IntoResponse;
     /// The type of Future this Handler will return
-    type Fut: Future<Output = Result<Self::Response, Self::Error>> + Send + Sync + 'static;
+    type Fut: Future<Output = Result<Self::Response, Self::Error>> + 'static;
     /// Function used to execute handler behavior
-    fn call(&self, event: Request, context: Context) -> Self::Fut;
+    fn call(&mut self, event: Request, context: Context) -> Self::Fut;
 }
 
 /// Adapts a [`Handler`](trait.Handler.html) to the `lambda::run` interface
@@ -137,20 +140,20 @@ impl<F, R, Fut> Handler for F
 where
     F: Fn(Request, Context) -> Fut,
     R: IntoResponse,
-    Fut: Future<Output = Result<R, Error>> + Send + Sync + 'static,
+    Fut: Future<Output = Result<R, Error>> + Send + 'static,
 {
     type Response = R;
     type Error = Error;
     type Fut = Fut;
-    fn call(&self, event: Request, context: Context) -> Self::Fut {
+    fn call(&mut self, event: Request, context: Context) -> Self::Fut {
         (self)(event, context)
     }
 }
 
 #[doc(hidden)]
 pub struct TransformResponse<R, E> {
-    is_alb: bool,
-    fut: Pin<Box<dyn Future<Output = Result<R, E>> + Send + Sync>>,
+    request_origin: RequestOrigin,
+    fut: Pin<Box<dyn Future<Output = Result<R, E>>>>,
 }
 
 impl<R, E> Future for TransformResponse<R, E>
@@ -160,9 +163,9 @@ where
     type Output = Result<LambdaResponse, E>;
     fn poll(mut self: Pin<&mut Self>, cx: &mut TaskContext) -> Poll<Self::Output> {
         match self.fut.as_mut().poll(cx) {
-            Poll::Ready(result) => {
-                Poll::Ready(result.map(|resp| LambdaResponse::from_response(self.is_alb, resp.into_response())))
-            }
+            Poll::Ready(result) => Poll::Ready(
+                result.map(|resp| LambdaResponse::from_response(&self.request_origin, resp.into_response())),
+            ),
             Poll::Pending => Poll::Pending,
         }
     }
@@ -183,7 +186,7 @@ impl<H: Handler> Handler for Adapter<H> {
     type Response = H::Response;
     type Error = H::Error;
     type Fut = H::Fut;
-    fn call(&self, event: Request, context: Context) -> Self::Fut {
+    fn call(&mut self, event: Request, context: Context) -> Self::Fut {
         self.handler.call(event, context)
     }
 }
@@ -191,9 +194,9 @@ impl<H: Handler> Handler for Adapter<H> {
 impl<H: Handler> LambdaHandler<LambdaRequest<'_>, LambdaResponse> for Adapter<H> {
     type Error = H::Error;
     type Fut = TransformResponse<H::Response, Self::Error>;
-    fn call(&self, event: LambdaRequest<'_>, context: Context) -> Self::Fut {
-        let is_alb = event.is_alb();
+    fn call(&mut self, event: LambdaRequest<'_>, context: Context) -> Self::Fut {
+        let request_origin = event.request_origin();
         let fut = Box::pin(self.handler.call(event.into(), context));
-        TransformResponse { is_alb, fut }
+        TransformResponse { request_origin, fut }
     }
 }
