@@ -69,8 +69,8 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #asyncness fn main() {
                         async fn actual(#event_name: #event_type, #context_name: #context_type) #ret #body
 
-                        let f = lambda_http::handler(actual);
-                        lambda_http::lambda::run(f).await.unwrap();
+                        let f = netlify_lambda_http::handler(actual);
+                        netlify_lambda_http::lambda::run(f).await.unwrap();
                     }
                 }
             } else {
@@ -80,8 +80,8 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #asyncness fn main() {
                         async fn actual(#event_name: #event_type, #context_name: #context_type) #ret #body
 
-                        let f = lambda::handler_fn(actual);
-                        lambda::run(f).await.unwrap();
+                        let f = netlify_lambda::handler_fn(actual);
+                        netlify_lambda::run(f).await.unwrap();
                     }
                 }
             }

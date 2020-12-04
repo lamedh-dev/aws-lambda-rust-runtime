@@ -1,25 +1,25 @@
 [package]
-name = "lambda_http"
+name = "netlify_lambda_http"
 version = "0.2.0-beta.1"
-authors = ["Doug Tangren"]
+authors = [
+    "Doug Tangren",
+    "David Calavera <david@netlify.com"
+]
 edition = "2018"
 description = "Application Load Balancer and API Gateway event types for AWS Lambda"
 keywords = ["AWS", "Lambda", "APIGateway", "ALB", "API"]
-license = "Apache-2.0"
-homepage = "https://github.com/awslabs/aws-lambda-rust-runtime"
-repository = "https://github.com/awslabs/aws-lambda-rust-runtime"
-documentation = "https://docs.rs/lambda_runtime"
+license = "Apache License 2.0"
+homepage = "https://github.com/netlify/aws-lambda-rust-runtime"
 readme = "../README.md"
 
 [badges]
-travis-ci = { repository = "awslabs/aws-lambda-rust-runtime" }
 maintenance = { status = "actively-developed" }
 
 [dependencies]
 base64 = "0.12"
 http = "0.2"
-lambda = { path = "../lambda", version = "0.1" }
-lambda-attributes = { path = "../lambda-attributes", version = "0.1" }
+netlify_lambda = { path = "../lambda" }
+netlify_lambda_attributes = { path = "../lambda-attributes" }
 serde = { version = "^1", features = ["derive"] }
 serde_derive = "^1"
 serde_json = "^1"

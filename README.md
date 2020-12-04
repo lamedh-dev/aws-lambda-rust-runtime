@@ -1,16 +1,29 @@
 # Rust Runtime for AWS Lambda
 
-This package makes it easy to run AWS Lambda Functions written in Rust. This workspace includes multiple crates:
+This package makes it easy to run AWS Lambda Functions written in Rust.
 
-- [![Docs](https://docs.rs/lambda/badge.svg)](https://docs.rs/lambda) **`lambda`** is a library that provides a Lambda runtime for applications written in Rust.
-- [![Docs](https://docs.rs/lambda_http/badge.svg)](https://docs.rs/lambda_http) **`lambda-http`** is a library that makes it easy to write API Gateway proxy event focused Lambda functions in Rust.
+:warning: :warning: :warning:
+:construction-worker: :construction-worker: :construction-worker:
+:fork-and-knife: :fork-and-knife: :fork-and-knife:
+
+This is a fork for the official AWS Lambda runtime for Rust. We've created this fork to be able to move forward all the contributions from the community that have been stalled in the awslabs repository without a release in sight.
+
+The crates in this repository are published to crates.io with the prefix `netlify-`.
+
+[Netlify Lambda](https://crates.io/crates/netlify_lambda) contains the runtime component.
+[Netlify Lambda Attributes](https://crates.io/crates/netlify_lambda_attributes) contains definitions to create Lambda functions.
+[Netlify Lambda HTTP](https://crates.io/crates/netlify_lambda_http) contains definitions to create Lambda functions that are accessed via HTTP endpoints.
+
+:warning: :warning: :warning:
+:construction-worker: :construction-worker: :construction-worker:
+:fork-and-knife: :fork-and-knife: :fork-and-knife:
 
 ## Example function
 
 The code below creates a simple function that receives an event with a `firstName` field and returns a message to the caller. Notice: this crate is tested against latest stable Rust.
 
 ```rust,no_run
-use lambda::{handler_fn, Context};
+use netlify_lambda::{handler_fn, Context};
 use serde_json::{json, Value};
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -18,7 +31,7 @@ type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let func = handler_fn(func);
-    lambda::run(func).await?;
+    netlify_lambda::run(func).await?;
     Ok(())
 }
 
@@ -29,7 +42,7 @@ async fn func(event: Value, _: Context) -> Result<Value, Error> {
 }
 ```
 
-The code above is the same as the [basic example](https://github.com/awslabs/aws-lambda-rust-runtime/blob/master/lambda/examples/hello-without-macro.rs) in the `lambda` crate.
+The code above is the same as the [basic example](https://github.com/netlify/aws-lambda-rust-runtime/blob/master/lambda/examples/hello-without-macro.rs) in the `lambda` crate.
 
 ### Deployment
 
@@ -160,13 +173,9 @@ $ unzip -o \
 `lambda` is a library for authoring reliable and performant Rust-based AWS Lambda functions. At a high level, it provides a few major components:
 
 - `Handler`, a trait that defines interactions between customer-authored code and this library.
-- `lambda::run`, function that runs an `Handler`.
+- `netlify_lambda::run`, function that runs an `Handler`.
 
-The function `handler_fn` converts a rust function or closure to `Handler`, which can then be run by `lambda::run`.
-
-## AWS event objects
-
-This project does not currently include Lambda event struct definitions though we [intend to do so in the future](https://github.com/awslabs/aws-lambda-rust-runtime/issues/12). Instead, the community-maintained [`aws_lambda_events`](https://crates.io/crates/aws_lambda_events) crate can be leveraged to provide strongly-typed Lambda event structs. You can create your own custom event objects and their corresponding structs as well.
+The function `handler_fn` converts a rust function or closure to `Handler`, which can then be run by `netlify_lambda::run`.
 
 ## Custom event objects
 

@@ -1,9 +1,14 @@
 [package]
-name = "lambda-attributes"
+name = "netlify_lambda_attributes"
 version = "0.1.0"
-authors = ["David Barsky <dbarsky@amazon.com>"]
+authors = [
+    "David Barsky <dbarsky@amazon.com>",
+    "David Calavera <david@netlify.com"
+]
 edition = "2018"
-license = "Apache-2.0"
+license = "Apache License 2.0"
+repository = "https://github.com/netlify/aws-lambda-rust-runtime"
+readme = "../README.md"
 
 [lib]
 proc-macro = true

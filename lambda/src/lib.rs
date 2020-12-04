@@ -14,7 +14,7 @@
 //!    the [Tokio] crate.
 //!
 //! 2. A type that conforms to the [`Handler`] trait. This type can then be passed
-//!    to the the `lambda::run` function, which launches and runs the Lambda runtime.
+//!    to the the `netlify_lambda::run` function, which launches and runs the Lambda runtime.
 //!
 //! An asynchronous function annotated with the `#[lambda]` attribute must
 //! accept an argument of type `A` which implements [`serde::Deserialize`], a [`lambda::Context`] and
@@ -22,7 +22,7 @@
 //! any type that implements `Into<Box<dyn std::error::Error + Send + Sync + 'static>>`.
 //!
 //! ```no_run
-//! use lambda::{lambda, Context};
+//! use netlify_lambda::{lambda, Context};
 //! use serde_json::Value;
 //!
 //! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -41,7 +41,7 @@
 //! [Tokio]: https://docs.rs/tokio/
 pub use crate::types::Context;
 use client::Client;
-pub use lambda_attributes::lambda;
+pub use netlify_lambda_attributes::lambda;
 use serde::{Deserialize, Serialize};
 use std::{
     convert::{TryFrom, TryInto},
@@ -139,7 +139,7 @@ where
 ///
 /// # Example
 /// ```no_run
-/// use lambda::{handler_fn, Context};
+/// use netlify_lambda::{handler_fn, Context};
 /// use serde_json::Value;
 ///
 /// type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -147,7 +147,7 @@ where
 /// #[tokio::main]
 /// async fn main() -> Result<(), Error> {
 ///     let func = handler_fn(func);
-///     lambda::run(func).await?;
+///     netlify_lambda::run(func).await?;
 ///     Ok(())
 /// }
 ///

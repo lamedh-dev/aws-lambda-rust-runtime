@@ -1,4 +1,4 @@
-use lambda_http::{
+use netlify_lambda_http::{
     lambda::{lambda, Context},
     IntoResponse, Request,
 };

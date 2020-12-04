@@ -66,7 +66,7 @@ impl Error for PayloadError {
 /// as well as `{"x":1, "y":2}` respectively.
 ///
 /// ```rust,no_run
-/// use lambda_http::{handler, lambda::{self, Context}, Body, IntoResponse, Request, Response, RequestExt};
+/// use netlify_lambda_http::{handler, lambda::{self, Context}, Body, IntoResponse, Request, Response, RequestExt};
 /// use serde::Deserialize;
 ///
 /// type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -81,7 +81,7 @@ impl Error for PayloadError {
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Error> {
-///   lambda::run(handler(add)).await?;
+///   netlify_lambda::run(handler(add)).await?;
 ///   Ok(())
 /// }
 ///

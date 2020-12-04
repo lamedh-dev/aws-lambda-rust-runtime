@@ -558,7 +558,7 @@ impl<'a> From<LambdaRequest<'a>> for http::Request<Body> {
 /// # Example
 ///
 /// ```rust,no_run
-/// use lambda_http::request::from_reader;
+/// use netlify_lambda_http::request::from_reader;
 /// use std::fs::File;
 /// use std::error::Error;
 ///
@@ -581,7 +581,7 @@ where
 /// # Example
 ///
 /// ```rust,no_run
-/// use lambda_http::request::from_str;
+/// use netlify_lambda_http::request::from_str;
 /// use std::fs::File;
 /// use std::error::Error;
 ///

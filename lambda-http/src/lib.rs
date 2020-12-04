@@ -22,8 +22,10 @@
 //! The full body of your `main` function will be executed on **every** invocation of your lambda task.
 //!
 //! ```rust,no_run
-//! use lambda_http::{lambda::{lambda, Context}, Request, IntoResponse};
-//!
+//! use netlify_lambda_http::{
+//!    lambda::{lambda, Context},
+//!    IntoResponse, Request,
+//! };
 //! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
 //! #[lambda(http)]
@@ -36,11 +38,11 @@
 //! ## Hello World, Without Macros
 //!
 //! For cases where your lambda might benfit from one time function initializiation might
-//! prefer a plain `main` function and invoke `lambda::run` explicitly in combination with the [`handler`](fn.handler.html) function.
+//! prefer a plain `main` function and invoke `netlify_lambda::run` explicitly in combination with the [`handler`](fn.handler.html) function.
 //! Depending on the runtime cost of your dependency bootstrapping, this can reduce the overall latency of your functions execution path.
 //!
 //! ```rust,no_run
-//! use lambda_http::{handler, lambda};
+//! use netlify_lambda_http::{handler, lambda};
 //!
 //! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
@@ -48,7 +50,7 @@
 //! async fn main() -> Result<(), Error> {
 //!     // initialize dependencies once here for the lifetime of your
 //!     // lambda task
-//!     lambda::run(handler(|request, context| async { Ok("👋 world!") })).await?;
+//!     netlify_lambda::run(handler(|request, context| async { Ok("👋 world!") })).await?;
 //!     Ok(())
 //! }
 //!
@@ -60,13 +62,13 @@
 //! with the [`RequestExt`](trait.RequestExt.html) trait.
 //!
 //! ```rust,no_run
-//! use lambda_http::{handler, lambda::{self, Context}, IntoResponse, Request, RequestExt};
+//! use netlify_lambda_http::{handler, lambda::{self, Context}, IntoResponse, Request, RequestExt};
 //!
 //! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Error> {
-//!     lambda::run(handler(hello)).await?;
+//!     netlify_lambda::run(handler(hello)).await?;
 //!     Ok(())
 //! }
 //!
@@ -90,9 +92,9 @@
 extern crate maplit;
 
 pub use http::{self, Response};
-use lambda::Handler as LambdaHandler;
-pub use lambda::{self, Context};
-pub use lambda_attributes::lambda;
+use netlify_lambda::Handler as LambdaHandler;
+pub use netlify_lambda::{self as lambda, Context};
+pub use netlify_lambda_attributes::lambda;
 
 mod body;
 pub mod ext;
@@ -130,7 +132,7 @@ pub trait Handler: Sized {
     fn call(&mut self, event: Request, context: Context) -> Self::Fut;
 }
 
-/// Adapts a [`Handler`](trait.Handler.html) to the `lambda::run` interface
+/// Adapts a [`Handler`](trait.Handler.html) to the `netlify_lambda::run` interface
 pub fn handler<H: Handler>(handler: H) -> Adapter<H> {
     Adapter { handler }
 }
