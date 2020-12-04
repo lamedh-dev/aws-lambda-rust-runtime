@@ -86,6 +86,7 @@ pub enum LambdaRequest<'a> {
         body: Option<Cow<'a, str>>,
         #[serde(default)]
         is_base64_encoded: bool,
+        #[serde(default)]
         request_context: ApiGatewayRequestContext,
     },
 }
@@ -144,7 +145,7 @@ pub struct ApiGatewayV2RequestContext {
 }
 
 /// See [context-variable-reference](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html) for more detail.
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiGatewayRequestContext {
     /// The API owner's AWS account ID.
