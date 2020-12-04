@@ -1,17 +1,17 @@
-#![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
+#![deny(clippy::all, clippy::cargo)]
 #![warn(missing_docs, nonstandard_style, rust_2018_idioms)]
 
 //! The official Rust runtime for AWS Lambda.
 //!
 //! There are two mechanisms available for defining a Lambda function:
-//! 1. The `#[lambda]` attribute, which generates the boilerplate to
+//! 1. The `lambda` attribute maco, which generates the boilerplate to
 //!    to launch and run a Lambda function.
 //!
-//!    The `#[lambda]` attribute _must_ be placed on an asynchronous main function.
+//!    The [`#[lambda]`] attribute _must_ be placed on an asynchronous main function.
 //!    However, as asynchronous main functions are not legal valid Rust
 //!    this means that the main function must also be decorated using a
-//!    `#[tokio::main]` attribute macro. This is available from
-//!    the [tokio](https://github.com/tokio-rs/tokio) crate.
+//!    [`#[tokio::main]`] attribute macro. This is available from
+//!    the [Tokio] crate.
 //!
 //! 2. A type that conforms to the [`Handler`] trait. This type can then be passed
 //!    to the the `lambda::run` function, which launches and runs the Lambda runtime.
@@ -33,9 +33,14 @@
 //!     Ok(event)
 //! }
 //! ```
+//!
+//! [`Handler`]: trait.Handler.html
+//! [`lambda::Context`]: struct.Context.html
+//! [`lambda`]: attr.lambda.html
+//! [`#[tokio::main]`]: https://docs.rs/tokio/0.2.21/tokio/attr.main.html
+//! [Tokio]: https://docs.rs/tokio/
 pub use crate::types::Context;
 use client::Client;
-use futures::stream::{Stream, StreamExt};
 pub use lambda_attributes::lambda;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -43,9 +48,12 @@ use std::{
     env, fmt,
     future::Future,
 };
+use tokio::stream::{Stream, StreamExt};
+use tracing::trace;
 
 mod client;
 mod requests;
+#[cfg(test)]
 mod simulated;
 /// Types available to a Lambda function.
 mod types;
@@ -88,22 +96,26 @@ impl Config {
     }
 }
 
-/// A trait describing an asynchronous function `A` to `B.
+/// A trait describing an asynchronous function `A` to `B`.
 pub trait Handler<A, B> {
     /// Errors returned by this handler.
     type Error;
-    /// The future response value of this handler.
+    /// Response of this handler.
     type Fut: Future<Output = Result<B, Self::Error>>;
-    /// Process the incoming event and `Context` then return the response asynchronously.
-    fn call(&mut self, event: A, context: Context) -> Self::Fut;
+    /// Handle the incoming event.
+    fn call(&self, event: A, context: Context) -> Self::Fut;
 }
 
-/// Returns a new `HandlerFn` with the given closure.
+/// Returns a new [`HandlerFn`] with the given closure.
+///
+/// [`HandlerFn`]: struct.HandlerFn.html
 pub fn handler_fn<F>(f: F) -> HandlerFn<F> {
     HandlerFn { f }
 }
 
-/// A `Handler` implemented by a closure.
+/// A [`Handler`] implemented by a closure.
+///
+/// [`Handler`]: trait.Handler.html
 #[derive(Clone, Debug)]
 pub struct HandlerFn<F> {
     f: F,
@@ -113,11 +125,11 @@ impl<F, A, B, Error, Fut> Handler<A, B> for HandlerFn<F>
 where
     F: Fn(A, Context) -> Fut,
     Fut: Future<Output = Result<B, Error>> + Send,
-    Error: Into<Error> + fmt::Debug,
+    Error: Into<Box<dyn std::error::Error + Send + Sync + 'static>> + fmt::Display,
 {
     type Error = Error;
     type Fut = Fut;
-    fn call(&mut self, req: A, ctx: Context) -> Self::Fut {
+    fn call(&self, req: A, ctx: Context) -> Self::Fut {
         (self.f)(req, ctx)
     }
 }
@@ -150,6 +162,7 @@ where
     A: for<'de> Deserialize<'de>,
     B: Serialize,
 {
+    trace!("Loading config from env");
     let mut handler = handler;
     let config = Config::from_env()?;
     let uri = config.endpoint.try_into().expect("Unable to convert to URL");
