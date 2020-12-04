@@ -9,7 +9,6 @@ repository = "https://github.com/awslabs/aws-lambda-rust-runtime"
 readme = "../README.md"
 
 [features]
-# no features by default
 default = ["simulated", "derive"]
 simulated = []
 derive = ["lambda-attributes"]
