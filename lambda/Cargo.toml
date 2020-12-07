@@ -1,6 +1,6 @@
 [package]
 name = "netlify_lambda"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     "David Barsky <dbarsky@amazon.com>",
     "David Calavera <david@netlify.com"
