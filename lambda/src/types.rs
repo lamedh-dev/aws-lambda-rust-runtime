@@ -128,14 +128,16 @@ impl TryFrom<HeaderMap> for Context {
                 .to_str()?
                 .parse()
                 .expect("Missing deadline"),
-            invoked_function_arn: headers["lambda-runtime-invoked-function-arn"]
-                .to_str()
-                .expect("Missing arn; this is a bug")
-                .to_owned(),
-            xray_trace_id: headers["lambda-runtime-trace-id"]
-                .to_str()
-                .expect("Invalid XRayTraceID sent by Lambda; this is a bug")
-                .to_owned(),
+            invoked_function_arn: headers
+                .get("lambda-runtime-invoked-function-arn")
+                .and_then(|h| h.to_str().ok())
+                .map(str::to_owned)
+                .unwrap_or_default(),
+            xray_trace_id: headers
+                .get("lambda-runtime-trace-id")
+                .and_then(|h| h.to_str().ok())
+                .map(str::to_owned)
+                .unwrap_or_default(),
             ..Default::default()
         };
         Ok(ctx)

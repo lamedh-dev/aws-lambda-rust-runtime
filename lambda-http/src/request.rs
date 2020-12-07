@@ -69,13 +69,13 @@ pub enum LambdaRequest<'a> {
     #[serde(rename_all = "camelCase")]
     ApiGateway {
         path: Cow<'a, str>,
-        #[serde(deserialize_with = "deserialize_method")]
+        #[serde(default, deserialize_with = "deserialize_method")]
         http_method: http::Method,
-        #[serde(deserialize_with = "deserialize_headers")]
+        #[serde(default, deserialize_with = "deserialize_headers")]
         headers: http::HeaderMap,
         #[serde(default, deserialize_with = "deserialize_multi_value_headers")]
         multi_value_headers: http::HeaderMap,
-        #[serde(deserialize_with = "nullable_default")]
+        #[serde(default, deserialize_with = "nullable_default")]
         query_string_parameters: StrMap,
         #[serde(default, deserialize_with = "nullable_default")]
         multi_value_query_string_parameters: StrMap,
@@ -116,6 +116,7 @@ pub enum RequestOrigin {
     Alb,
 }
 
+/// Represents the request context for ApiGateway V2
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiGatewayV2RequestContext {
@@ -449,7 +450,7 @@ impl<'a> From<LambdaRequest<'a>> for http::Request<Body> {
                             headers
                                 .get(http::header::HOST)
                                 .and_then(|val| val.to_str().ok())
-                                .unwrap_or_default(),
+                                .unwrap_or_else(|| "localhost"),
                             path
                         )
                     })

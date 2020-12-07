@@ -25,8 +25,8 @@ use serde::ser::{Error as SerError, Serialize, Serializer};
 /// text produce `Body::Text` variants
 ///
 /// ```
-/// assert!(match lambda_http::Body::from("text") {
-///   lambda_http::Body::Text(_) => true,
+/// assert!(match netlify_lambda_http::Body::from("text") {
+///   netlify_lambda_http::Body::Text(_) => true,
 ///   _ => false
 /// })
 /// ```
@@ -36,8 +36,8 @@ use serde::ser::{Error as SerError, Serialize, Serializer};
 /// Types like `Vec<u8>` and `&[u8]` whose types reflect raw bytes produce `Body::Binary` variants
 ///
 /// ```
-/// assert!(match lambda_http::Body::from("text".as_bytes()) {
-///   lambda_http::Body::Binary(_) => true,
+/// assert!(match netlify_lambda_http::Body::from("text".as_bytes()) {
+///   netlify_lambda_http::Body::Binary(_) => true,
 ///   _ => false
 /// })
 /// ```
@@ -49,8 +49,8 @@ use serde::ser::{Error as SerError, Serialize, Serializer};
 /// The unit type ( `()` ) whose type represents an empty value produces `Body::Empty` variants
 ///
 /// ```
-/// assert!(match lambda_http::Body::from(()) {
-///   lambda_http::Body::Empty => true,
+/// assert!(match netlify_lambda_http::Body::from(()) {
+///   netlify_lambda_http::Body::Empty => true,
 ///   _ => false
 /// })
 /// ```
