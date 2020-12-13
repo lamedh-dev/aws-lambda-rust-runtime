@@ -3,7 +3,6 @@
 
 use netlify_lambda::{handler_fn, Context};
 use serde::{Deserialize, Serialize};
-use simple_logger;
 
 /// A shorthand for `Box<dyn std::error::Error + Send + Sync + 'static>`
 /// type required by aws-lambda-rust-runtime.
@@ -29,10 +28,6 @@ struct Response {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    // required to enable CloudWatch error logging by the runtime
-    // can be replaced with any other method of initializing `log`
-    simple_logger::init_with_level(log::Level::Info)?;
-
     let func = handler_fn(my_handler);
     netlify_lambda::run(func).await?;
     Ok(())
