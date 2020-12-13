@@ -1,8 +1,4 @@
-use netlify_lambda_http::{
-    handler,
-    lambda::{self, Context},
-    IntoResponse, Request, RequestExt, Response,
-};
+use netlify_lambda_http::{handler, lambda::Context, IntoResponse, Request, RequestExt, Response};
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
