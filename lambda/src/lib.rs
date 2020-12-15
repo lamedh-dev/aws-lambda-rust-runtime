@@ -60,6 +60,9 @@ mod types;
 use requests::{EventCompletionRequest, EventErrorRequest, IntoRequest, NextEventRequest};
 use types::Diagnostic;
 
+static DEFAULT_LOG_GROUP: &str = "/aws/lambda/Functions";
+static DEFAULT_LOG_STREAM: &str = "$LATEST";
+
 /// Error type that lambdas may result in
 pub(crate) type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
@@ -88,8 +91,8 @@ impl Config {
             function_name: env::var("AWS_LAMBDA_FUNCTION_NAME")?,
             memory: env::var("AWS_LAMBDA_FUNCTION_MEMORY_SIZE")?.parse::<i32>()?,
             version: env::var("AWS_LAMBDA_FUNCTION_VERSION")?,
-            log_stream: env::var("AWS_LAMBDA_LOG_STREAM_NAME")?,
-            log_group: env::var("AWS_LAMBDA_LOG_GROUP_NAME")?,
+            log_stream: env::var("AWS_LAMBDA_LOG_STREAM_NAME").unwrap_or_else(|_e| DEFAULT_LOG_STREAM.to_owned()),
+            log_group: env::var("AWS_LAMBDA_LOG_GROUP_NAME").unwrap_or_else(|_e| DEFAULT_LOG_GROUP.to_owned()),
         };
         Ok(conf)
     }
