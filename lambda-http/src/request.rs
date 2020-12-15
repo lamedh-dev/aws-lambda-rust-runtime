@@ -156,16 +156,10 @@ pub struct ApiGatewayRequestContext {
     pub resource_id: String,
     /// The deployment stage of the API request (for example, Beta or Prod).
     pub stage: String,
-    /// The domain name of the API Gateway.
-    pub domain_name: String,
-    /// The domain prefix of the API Gateway.
-    pub domain_prefix: String,
     /// The ID that API Gateway assigns to the API request.
     pub request_id: String,
     /// The path to your resource. For example, for the non-proxy request URI of `https://{rest-api-id.execute-api.{region}.amazonaws.com/{stage}/root/child`, The $context.resourcePath value is /root/child.
     pub resource_path: String,
-    /// The HTTP protocol used for this request.
-    pub protocol: String,
     /// The HTTP method used. Valid values include: DELETE, GET, HEAD, OPTIONS, PATCH, POST, and PUT.
     pub http_method: String,
     /// The stringified value of the specified key-value pair of the context map returned from an API Gateway Lambda authorizer function.
@@ -175,11 +169,6 @@ pub struct ApiGatewayRequestContext {
     pub api_id: String,
     /// Cofnito identity information
     pub identity: Identity,
-    /// The time of the request in String format.
-    pub request_time: String,
-    /// The epoch of the request.
-    pub request_time_epoch: i64,
-    pub operation_name: Option<String>,
 }
 
 /// Elastic load balancer context information
@@ -255,6 +244,7 @@ pub struct Identity {
     /// For API methods that require an API key, this variable is the API key associated with the method request.
     /// For methods that don't require an API key, this variable is null.
     pub api_key: Option<String>,
+    /// The identifier of an ApiKey used in a UsagePlan.
     pub api_key_id: Option<String>,
     /// Undocumented. Can be the API key ID associated with an API request that requires an API key.
     /// The description of `api_key` and `access_key` may actually be reversed.
@@ -790,7 +780,7 @@ mod tests {
                 "user": ""
               },
               "resourcePath": "",
-              "authorizer": null,
+              "authorizer": {},
               "httpMethod": "",
               "requestTime": "",
               "requestTimeEpoch": 0,
