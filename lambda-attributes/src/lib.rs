@@ -6,7 +6,7 @@ use quote::quote_spanned;
 use syn::{spanned::Spanned, AttributeArgs, FnArg, ItemFn, Meta, NestedMeta};
 
 /// Return true if attribute macro args declares http flavor in the form `#[lambda(http)]`
-fn is_http(args: &AttributeArgs) -> bool {
+fn is_http(args: AttributeArgs) -> bool {
     args.iter().any(|arg| match arg {
         NestedMeta::Meta(Meta::Path(path)) => path.is_ident("http"),
         _ => false,
@@ -63,7 +63,7 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
             let context_name = &context.pat;
             let context_type = &context.ty;
 
-            if is_http(&args) {
+            if is_http(args) {
                 quote_spanned! { input.span() =>
 
                     #(#attrs)*

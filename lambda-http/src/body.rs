@@ -178,7 +178,6 @@ impl<'a> Serialize for Body {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json;
     use std::collections::HashMap;
 
     #[test]
@@ -217,7 +216,7 @@ mod tests {
 
     #[test]
     fn from_cow_bytes() {
-        match Body::from(Cow::from("foo".as_bytes())) {
+        match Body::from(Cow::from(b"foo".to_vec())) {
             Body::Binary(_) => (),
             not => assert!(false, "expected Body::Binary(...) got {:?}", not),
         }
@@ -225,7 +224,7 @@ mod tests {
 
     #[test]
     fn from_bytes() {
-        match Body::from("foo".as_bytes()) {
+        match Body::from(b"foo".to_vec()) {
             Body::Binary(_) => (),
             not => assert!(false, "expected Body::Binary(...) got {:?}", not),
         }
@@ -241,7 +240,7 @@ mod tests {
     #[test]
     fn serialize_binary() {
         let mut map = HashMap::new();
-        map.insert("foo", Body::from("bar".as_bytes()));
+        map.insert("foo", Body::from(b"bar".to_vec()));
         assert_eq!(serde_json::to_string(&map).unwrap(), r#"{"foo":"YmFy"}"#);
     }
 

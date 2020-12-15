@@ -41,10 +41,12 @@ pub struct Connector {
     pub inner: SimStream,
 }
 
+type FutureConnector<R, E> = Pin<Box<dyn Future<Output = Result<R, E>> + Send>>;
+
 impl Service<Uri> for Connector {
     type Response = SimStream;
     type Error = std::io::Error;
-    type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>> + Send>>;
+    type Future = FutureConnector<Self::Response, Self::Error>;
 
     fn poll_ready(&mut self, _: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
         Poll::Ready(Ok(()))
@@ -127,6 +129,7 @@ impl BufferState {
     fn read(&mut self, to_buf: &mut [u8]) -> usize {
         // Read no more bytes than we have available, and no more bytes than we were asked for
         let bytes_to_read = min(to_buf.len(), self.buffer.len());
+        #[allow(clippy::needless_range_loop)]
         for i in 0..bytes_to_read {
             to_buf[i] = self.buffer.pop_back().unwrap();
         }

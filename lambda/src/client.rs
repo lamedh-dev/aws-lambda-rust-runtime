@@ -39,7 +39,6 @@ where
     pub(crate) async fn call(&self, req: Request<Body>) -> Result<Response<Body>, Error> {
         let req = self.set_origin(req)?;
         let (parts, body) = req.into_parts();
-        let body = Body::from(body);
         let req = Request::from_parts(parts, body);
         let response = self.client.request(req).await?;
         Ok(response)
@@ -81,7 +80,7 @@ mod endpoint_tests {
             .path_and_query()
             .unwrap()
             .as_str()
-            .split("/")
+            .split('/')
             .collect::<Vec<&str>>();
         match &path[1..] {
             ["2018-06-01", "runtime", "invocation", "next"] => next_event(&req).await,
@@ -101,15 +100,15 @@ mod endpoint_tests {
         select! {
             _ = rx => {
                 info!("Received cancelation signal");
-                return Ok(())
+                Ok(())
             }
             res = conn => {
                 match res {
-                    Ok(()) => return Ok(()),
                     Err(e) => {
                         error!(message = "Got error serving connection", e = %e);
-                        return Err(e);
-                    }
+                        Err(e)
+                    },
+                    ok => ok
                 }
             }
         }
@@ -128,7 +127,7 @@ mod endpoint_tests {
             trace_id: "Root=1-5bef4de7-ad49b0e87f6ef6c87fc2e700;Parent=9a9197af755a6419",
             body: serde_json::to_vec(&body)?,
         };
-        rsp.into_rsp().map_err(|e| e.into())
+        rsp.into_rsp()
     }
 
     async fn complete_event(req: &Request<Body>, id: &str) -> Result<Response<Body>, Error> {
@@ -202,7 +201,7 @@ mod endpoint_tests {
         tx.send(()).expect("Receiver has been dropped");
         match server.await {
             Ok(_) => Ok(()),
-            Err(e) if e.is_panic() => return Err::<(), Error>(e.into()),
+            Err(e) if e.is_panic() => Err::<(), Error>(e.into()),
             Err(_) => unreachable!("This branch shouldn't be reachable"),
         }
     }
@@ -234,7 +233,7 @@ mod endpoint_tests {
         tx.send(()).expect("Receiver has been dropped");
         match server.await {
             Ok(_) => Ok(()),
-            Err(e) if e.is_panic() => return Err::<(), Error>(e.into()),
+            Err(e) if e.is_panic() => Err::<(), Error>(e.into()),
             Err(_) => unreachable!("This branch shouldn't be reachable"),
         }
     }
@@ -268,7 +267,7 @@ mod endpoint_tests {
         tx.send(()).expect("Receiver has been dropped");
         match server.await {
             Ok(_) => Ok(()),
-            Err(e) if e.is_panic() => return Err::<(), Error>(e.into()),
+            Err(e) if e.is_panic() => Err::<(), Error>(e.into()),
             Err(_) => unreachable!("This branch shouldn't be reachable"),
         }
     }

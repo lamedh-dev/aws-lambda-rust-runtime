@@ -155,7 +155,7 @@ mod tests {
         data.insert("baz".into(), vec!["boom".into()]);
         let strmap = StrMap(data.into());
         let mut values = strmap.iter().map(|(_, v)| v).collect::<Vec<_>>();
-        values.sort();
+        values.sort_unstable();
         assert_eq!(values, vec!["bar", "boom"]);
     }
 }

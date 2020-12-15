@@ -23,6 +23,7 @@ use std::{borrow::Cow, collections::HashMap, fmt, io::Read, mem};
 #[doc(hidden)]
 #[derive(Deserialize, Debug)]
 #[serde(untagged)]
+#[allow(clippy::large_enum_variant)] // FIXME: Reduce memory by boxing inner structs.
 pub enum LambdaRequest<'a> {
     #[serde(rename_all = "camelCase")]
     ApiGatewayV2 {
@@ -194,6 +195,7 @@ pub struct AlbRequestContext {
 /// for both ALB and API Gateway and HTTP API events
 #[derive(Deserialize, Debug, Clone)]
 #[serde(untagged)]
+#[allow(clippy::large_enum_variant)] // FIXME: Reduce memory by boxing inner structs.
 pub enum RequestContext {
     /// API Gateway v2 request context
     ApiGatewayV2(ApiGatewayV2RequestContext),
@@ -411,7 +413,7 @@ impl<'a> From<LambdaRequest<'a>> for http::Request<Body> {
                             headers
                                 .get("X-Forwarded-Proto")
                                 .and_then(|val| val.to_str().ok())
-                                .unwrap_or_else(|| "https"),
+                                .unwrap_or("https"),
                             headers
                                 .get(http::header::HOST)
                                 .and_then(|val| val.to_str().ok())
@@ -460,11 +462,11 @@ impl<'a> From<LambdaRequest<'a>> for http::Request<Body> {
                             headers
                                 .get("X-Forwarded-Proto")
                                 .and_then(|val| val.to_str().ok())
-                                .unwrap_or_else(|| "https"),
+                                .unwrap_or("https"),
                             headers
                                 .get(http::header::HOST)
                                 .and_then(|val| val.to_str().ok())
-                                .unwrap_or_else(|| "localhost"),
+                                .unwrap_or("localhost"),
                             path
                         )
                     })
@@ -523,7 +525,7 @@ impl<'a> From<LambdaRequest<'a>> for http::Request<Body> {
                             headers
                                 .get("X-Forwarded-Proto")
                                 .and_then(|val| val.to_str().ok())
-                                .unwrap_or_else(|| "https"),
+                                .unwrap_or("https"),
                             headers
                                 .get(http::header::HOST)
                                 .and_then(|val| val.to_str().ok())
@@ -615,7 +617,6 @@ pub fn from_str(s: &str) -> Result<crate::Request, JsonError> {
 mod tests {
     use super::*;
     use crate::RequestExt;
-    use serde_json;
     use std::{collections::HashMap, fs::File};
 
     #[test]
