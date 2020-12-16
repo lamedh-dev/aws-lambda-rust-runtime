@@ -1,4 +1,5 @@
-#![deny(clippy::all)]
+#![deny(clippy::all, clippy::cargo)]
+#![warn(missing_docs, nonstandard_style, rust_2018_idioms)]
 
 //! The official Rust runtime for AWS Lambda.
 //!

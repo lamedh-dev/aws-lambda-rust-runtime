@@ -1,4 +1,15 @@
-#![deny(clippy::all)]
+#![deny(missing_docs)]
+
+//! The official Rust runtime for AWS Lambda.
+//!
+//! This package contains macro definitions to work with lambda.
+//!
+//! An asynchronous function annotated with the `#[lambda]` attribute must
+//! accept an argument of type `A` which implements [`serde::Deserialize`], a [`lambda::Context`] and
+//! return a `Result<B, E>`, where `B` implements [`serde::Serializable`]. `E` is
+//! any type that implements `Into<Box<dyn std::error::Error + Send + Sync + 'static>>`.
+//! ```
+
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
@@ -6,7 +17,7 @@ use quote::quote_spanned;
 use syn::{spanned::Spanned, AttributeArgs, FnArg, ItemFn, Meta, NestedMeta};
 
 /// Return true if attribute macro args declares http flavor in the form `#[lambda(http)]`
-fn is_http(args: &AttributeArgs) -> bool {
+fn is_http(args: AttributeArgs) -> bool {
     args.iter().any(|arg| match arg {
         NestedMeta::Meta(Meta::Path(path)) => path.is_ident("http"),
         _ => false,
@@ -14,6 +25,7 @@ fn is_http(args: &AttributeArgs) -> bool {
 }
 
 #[proc_macro_attribute]
+/// Wrap an async function into the lambda constructs
 pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as ItemFn);
     let args = syn::parse_macro_input!(attr as AttributeArgs);
@@ -63,7 +75,7 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
             let context_name = &context.pat;
             let context_type = &context.ty;
 
-            if is_http(&args) {
+            if is_http(args) {
                 quote_spanned! { input.span() =>
 
                     #(#attrs)*
