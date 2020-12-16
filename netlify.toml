@@ -1,0 +1,9 @@
+[build]
+command = "cargo doc --no-deps --all-features && cp -r target/doc _netlify_out"
+publish = "_netlify_out"
+
+[[redirects]]
+from = "/"
+to = "/netlify_lambda_http/"
+status = 301
+force = true
