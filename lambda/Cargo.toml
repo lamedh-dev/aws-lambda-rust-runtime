@@ -10,6 +10,7 @@ edition = "2018"
 license = "Apache-2.0"
 repository = "https://github.com/netlify/aws-lambda-rust-runtime"
 readme = "../README.md"
+documentation = "https://rs-lambda-runtime.netlify.engineering/netlify_lambda"
 
 [features]
 default = ["simulated", "derive"]
