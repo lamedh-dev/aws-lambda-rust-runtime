@@ -1,6 +1,6 @@
 [package]
 name = "netlify_lambda_http"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Doug Tangren", "David Calavera <david@netlify.com>"]
 edition = "2018"
 description = "Application Load Balancer and API Gateway event types for AWS Lambda"
