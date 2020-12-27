@@ -9,7 +9,7 @@ use std::{
     sync::{Arc, Mutex},
     task::{Context, Poll, Waker},
 };
-use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tower_service::Service;
 
 /// Creates a pair of `AsyncRead`/`AsyncWrite` data streams, where the write end of each member of the pair
@@ -89,7 +89,7 @@ impl AsyncWrite for SimStream {
 
 /// Delegates to the underlying `read` member's methods
 impl AsyncRead for SimStream {
-    fn poll_read(mut self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &mut [u8]) -> Poll<IoResult<usize>> {
+    fn poll_read(mut self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &mut ReadBuf<'_>) -> Poll<IoResult<()>> {
         Pin::new(&mut self.read).poll_read(cx, buf)
     }
 }
@@ -174,25 +174,25 @@ pub struct ReadHalf {
 }
 
 impl AsyncRead for ReadHalf {
-    fn poll_read(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &mut [u8]) -> Poll<IoResult<usize>> {
+    fn poll_read(self: Pin<&mut Self>, cx: &mut Context<'_>, buf: &mut ReadBuf<'_>) -> Poll<IoResult<()>> {
         // Acquire the lock for the buffer
         let mut read_from = self
             .buffer
             .lock()
             .expect("Lock was poisoned when acquiring buffer lock for ReadHalf");
 
-        let bytes_read = read_from.read(buf);
+        let bytes_read = read_from.read(buf.initialize_unfilled());
 
-        // Returning Poll::Ready(Ok(0)) would indicate that there is nothing more to read, which
+        // bytes_read == 0 would indicate that there is nothing more to read, which
         // means that someone trying to read from a VecDeque that hasn't been written to yet
         // would get an Eof error (as I learned the hard way).  Instead we should return Poll:Pending
         // to indicate that there could be more to read in the future.
-        if (bytes_read) == 0 {
+        if bytes_read == 0 {
             read_from.read_waker = Some(cx.waker().clone());
             Poll::Pending
         } else {
-            //read_from.read_waker = Some(cx.waker().clone());
-            Poll::Ready(Ok(bytes_read))
+            buf.advance(bytes_read);
+            Poll::Ready(Ok(()))
         }
     }
 }
