@@ -16,6 +16,7 @@ maintenance = { status = "actively-developed" }
 [dependencies]
 base64 = "0.13"
 http = "0.2"
+itertools = "0.9"
 netlify_lambda = { path = "../lambda", version = "0.1" }
 netlify_lambda_attributes = { path = "../lambda-attributes", version = "0.1" }
 serde = { version = "^1", features = ["derive"] }

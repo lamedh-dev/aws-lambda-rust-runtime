@@ -193,10 +193,10 @@ impl<H: Handler> Handler for Adapter<H> {
     }
 }
 
-impl<H: Handler> LambdaHandler<LambdaRequest<'_>, LambdaResponse> for Adapter<H> {
+impl<H: Handler> LambdaHandler<LambdaRequest, LambdaResponse> for Adapter<H> {
     type Error = H::Error;
     type Fut = TransformResponse<H::Response, Self::Error>;
-    fn call(&mut self, event: LambdaRequest<'_>, context: Context) -> Self::Fut {
+    fn call(&mut self, event: LambdaRequest, context: Context) -> Self::Fut {
         let request_origin = event.request_origin();
         let fut = Box::pin(self.handler.call(event.into(), context));
         TransformResponse { request_origin, fut }
