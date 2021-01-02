@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use serde::{
     de::{MapAccess, Visitor},
     Deserialize, Deserializer,
@@ -7,7 +8,6 @@ use std::{
     fmt,
     sync::Arc,
 };
-use itertools::Itertools;
 
 /// A read-only view into a map of string data which may contain multiple values
 ///
@@ -64,7 +64,6 @@ impl From<HashMap<String, String>> for StrMap {
         StrMap(Arc::new(inner.into_iter().into_group_map()))
     }
 }
-
 
 /// A read only reference to `StrMap` key and value slice pairings
 pub struct StrMapIter<'a> {

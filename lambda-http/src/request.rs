@@ -4,23 +4,17 @@
 //! request extension method provided by [lambda_http::RequestExt](../trait.RequestExt.html)
 //!
 use crate::{
-    body::Body,
     ext::{PathParameters, QueryStringParameters, StageVariables},
     strmap::StrMap,
 };
+use aws_lambda_events::encodings::Body;
+use aws_lambda_events::event::alb::{AlbTargetGroupRequest, AlbTargetGroupRequestContext};
+use aws_lambda_events::event::apigw::{
+    ApiGatewayProxyRequest, ApiGatewayProxyRequestContext, ApiGatewayV2httpRequest, ApiGatewayV2httpRequestContext,
+};
 use http::header::HeaderName;
 use serde::Deserialize;
-use aws_lambda_events::event::apigw::{
-    ApiGatewayV2httpRequest,
-    ApiGatewayV2httpRequestContext,
-    ApiGatewayProxyRequest,
-    ApiGatewayProxyRequestContext,
-};
-use aws_lambda_events::event::alb::{
-    AlbTargetGroupRequest,
-    AlbTargetGroupRequestContext,
-};
-use serde_json::{error::Error as JsonError};
+use serde_json::error::Error as JsonError;
 use std::{io::Read, mem};
 
 /// Internal representation of an Lambda http event from
@@ -85,20 +79,19 @@ impl<'a> From<LambdaRequest> for http::Request<Body> {
                 let http_method = ag.request_context.http.method.clone();
                 let builder = http::Request::builder()
                     .uri({
-                        let scheme = ag.headers.get(x_forwarded_proto)
+                        let scheme = ag
+                            .headers
+                            .get(x_forwarded_proto)
                             .and_then(|s| s.to_str().ok())
                             .unwrap_or("https");
-                        let host = ag.headers.get(http::header::HOST)
+                        let host = ag
+                            .headers
+                            .get(http::header::HOST)
                             .and_then(|s| s.to_str().ok())
                             .or_else(|| ag.request_context.domain_name.as_deref())
                             .unwrap_or("localhost");
 
-                        let mut url = format!(
-                            "{}://{}{}",
-                            scheme,
-                            host,
-                            ag.raw_path.as_deref().unwrap_or_default()
-                        );
+                        let mut url = format!("{}://{}{}", scheme, host, ag.raw_path.as_deref().unwrap_or_default());
                         if let Some(query) = ag.raw_query_string {
                             url.push('?');
                             url.push_str(&query);
@@ -116,11 +109,15 @@ impl<'a> From<LambdaRequest> for http::Request<Body> {
                         headers.append(http::header::COOKIE, header_value);
                     }
                 }
-    
+
                 let base64 = ag.is_base64_encoded;
 
                 let mut req = builder
-                    .body(ag.body.as_deref().map_or_else(Body::default, |b| Body::from_maybe_encoded(base64, b)))
+                    .body(
+                        ag.body
+                            .as_deref()
+                            .map_or_else(Body::default, |b| Body::from_maybe_encoded(base64, b)),
+                    )
                     .expect("failed to build request");
 
                 // no builder method that sets headers in batch
@@ -133,19 +130,18 @@ impl<'a> From<LambdaRequest> for http::Request<Body> {
                 let http_method = ag.http_method;
                 let builder = http::Request::builder()
                     .uri({
-                        let scheme = ag.headers.get(x_forwarded_proto)
+                        let scheme = ag
+                            .headers
+                            .get(x_forwarded_proto)
                             .and_then(|s| s.to_str().ok())
                             .unwrap_or("https");
-                        let host = ag.headers.get(http::header::HOST)
+                        let host = ag
+                            .headers
+                            .get(http::header::HOST)
                             .and_then(|s| s.to_str().ok())
                             .unwrap_or("localhost");
 
-                        format!(
-                            "{}://{}{}",
-                            scheme,
-                            host,
-                            ag.path.unwrap_or_default()
-                        )
+                        format!("{}://{}{}", scheme, host, ag.path.unwrap_or_default())
                     })
                     // multi-valued query string parameters are always a super
                     // set of singly valued query string parameters,
@@ -168,7 +164,11 @@ impl<'a> From<LambdaRequest> for http::Request<Body> {
 
                 let base64 = ag.is_base64_encoded.unwrap_or_default();
                 let mut req = builder
-                    .body(ag.body.as_deref().map_or_else(Body::default, |b| Body::from_maybe_encoded(base64, b)))
+                    .body(
+                        ag.body
+                            .as_deref()
+                            .map_or_else(Body::default, |b| Body::from_maybe_encoded(base64, b)),
+                    )
                     .expect("failed to build request");
 
                 // no builder method that sets headers in batch
@@ -181,19 +181,18 @@ impl<'a> From<LambdaRequest> for http::Request<Body> {
                 let http_method = alb.http_method;
                 let builder = http::Request::builder()
                     .uri({
-                        let scheme = alb.headers.get(x_forwarded_proto)
+                        let scheme = alb
+                            .headers
+                            .get(x_forwarded_proto)
                             .and_then(|s| s.to_str().ok())
                             .unwrap_or("https");
-                        let host = alb.headers.get(http::header::HOST)
+                        let host = alb
+                            .headers
+                            .get(http::header::HOST)
                             .and_then(|s| s.to_str().ok())
                             .unwrap_or("localhost");
 
-                        format!(
-                            "{}://{}{}",
-                            scheme,
-                            host,
-                            alb.path.unwrap_or_default()
-                        )
+                        format!("{}://{}{}", scheme, host, alb.path.unwrap_or_default())
                     })
                     // multi valued query string parameters are always a super
                     // set of singly valued query string parameters,
@@ -215,7 +214,11 @@ impl<'a> From<LambdaRequest> for http::Request<Body> {
                 let base64 = alb.is_base64_encoded;
 
                 let mut req = builder
-                    .body(alb.body.as_deref().map_or_else(Body::default, |b| Body::from_maybe_encoded(base64, b)))
+                    .body(
+                        alb.body
+                            .as_deref()
+                            .map_or_else(Body::default, |b| Body::from_maybe_encoded(base64, b)),
+                    )
                     .expect("failed to build request");
 
                 // no builder method that sets headers in batch

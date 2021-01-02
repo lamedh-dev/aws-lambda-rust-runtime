@@ -96,12 +96,13 @@ use netlify_lambda::Handler as LambdaHandler;
 pub use netlify_lambda::{self as lambda, Context};
 pub use netlify_lambda_attributes::lambda;
 
-mod body;
+use aws_lambda_events::encodings::Body;
+
 pub mod ext;
 pub mod request;
 mod response;
 mod strmap;
-pub use crate::{body::Body, ext::RequestExt, response::IntoResponse, strmap::StrMap};
+pub use crate::{ext::RequestExt, response::IntoResponse, strmap::StrMap};
 use crate::{
     request::{LambdaRequest, RequestOrigin},
     response::LambdaResponse,
