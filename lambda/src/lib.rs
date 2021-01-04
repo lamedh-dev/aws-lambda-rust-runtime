@@ -4,8 +4,8 @@
 //! The official Rust runtime for AWS Lambda.
 //!
 //! There are two mechanisms available for defining a Lambda function:
-//! 1. The `lambda` attribute maco, which generates the boilerplate to
-//!    to launch and run a Lambda function.
+//! 1. The `lambda` attribute macro, which generates the boilerplate to
+//!    launch and run a Lambda function.
 //!
 //!    The [`#[lambda]`] attribute _must_ be placed on an asynchronous main function.
 //!    However, as asynchronous main functions are not legal valid Rust
