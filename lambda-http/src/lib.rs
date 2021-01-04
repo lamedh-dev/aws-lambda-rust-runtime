@@ -97,6 +97,7 @@ pub use netlify_lambda::{self as lambda, Context};
 pub use netlify_lambda_attributes::lambda;
 
 use aws_lambda_events::encodings::Body;
+use aws_lambda_events::event::apigw::ApiGatewayProxyRequest;
 
 pub mod ext;
 pub mod request;
@@ -104,7 +105,7 @@ mod response;
 mod strmap;
 pub use crate::{ext::RequestExt, response::IntoResponse, strmap::StrMap};
 use crate::{
-    request::{LambdaRequest, RequestOrigin},
+    request::{self as lambda_request, LambdaRequest, RequestOrigin},
     response::LambdaResponse,
 };
 use std::{
@@ -131,11 +132,6 @@ pub trait Handler: Sized {
     type Fut: Future<Output = Result<Self::Response, Self::Error>> + 'static;
     /// Function used to execute handler behavior
     fn call(&mut self, event: Request, context: Context) -> Self::Fut;
-}
-
-/// Adapts a [`Handler`](trait.Handler.html) to the `netlify_lambda::run` interface
-pub fn handler<H: Handler>(handler: H) -> Adapter<H> {
-    Adapter { handler }
 }
 
 /// An implementation of `Handler` for a given closure return a `Future` representing the computed response
@@ -174,6 +170,14 @@ where
     }
 }
 
+/// Adapts a [`Handler`](trait.Handler.html) to the `netlify_lambda::run` interface
+///
+/// This is an abstract interface that tries to deserialize the request payload
+/// in any possible [`request::LambdaRequest`] value.
+pub fn handler<H: Handler>(handler: H) -> Adapter<H> {
+    Adapter { handler }
+}
+
 /// Exists only to satisfy the trait cover rule for `lambda::Handler` impl
 ///
 /// User code should never need to interact with this type directly. Since `Adapter` implements `Handler`
@@ -200,6 +204,46 @@ impl<H: Handler> LambdaHandler<LambdaRequest, LambdaResponse> for Adapter<H> {
     fn call(&mut self, event: LambdaRequest, context: Context) -> Self::Fut {
         let request_origin = event.request_origin();
         let fut = Box::pin(self.handler.call(event.into(), context));
+        TransformResponse { request_origin, fut }
+    }
+}
+
+/// Adapts a [`Handler`](trait.Handler.html) to the `netlify_lambda::run` interface
+///
+/// This is a concrete interface that tries to deserialize the request payload
+/// into an AWS API Gateway Proxy definition. This definition is the same that the
+/// AWS Invoke API uses to send invocation requests to lambda.
+pub fn proxy_handler<H: Handler>(handler: H) -> ProxyAdapter<H> {
+    ProxyAdapter { handler }
+}
+
+/// Exists only to satisfy the trait cover rule for `lambda::Handler` impl
+///
+/// User code should never need to interact with this type directly. Since `ProxyAdapter` implements `Handler`
+/// It serves as a opaque trait covering type.
+///
+/// See [this article](http://smallcultfollowing.com/babysteps/blog/2015/01/14/little-orphan-impls/)
+/// for a larger explaination of why this is nessessary
+pub struct ProxyAdapter<H: Handler> {
+    handler: H,
+}
+
+impl<H: Handler> Handler for ProxyAdapter<H> {
+    type Response = H::Response;
+    type Error = H::Error;
+    type Fut = H::Fut;
+    fn call(&mut self, event: Request, context: Context) -> Self::Fut {
+        self.handler.call(event, context)
+    }
+}
+
+impl<H: Handler> LambdaHandler<ApiGatewayProxyRequest, LambdaResponse> for ProxyAdapter<H> {
+    type Error = H::Error;
+    type Fut = TransformResponse<H::Response, Self::Error>;
+    fn call(&mut self, event: ApiGatewayProxyRequest, context: Context) -> Self::Fut {
+        let request_origin = RequestOrigin::ApiGatewayV1;
+        let req = lambda_request::into_proxy_request(event);
+        let fut = Box::pin(self.handler.call(req, context));
         TransformResponse { request_origin, fut }
     }
 }
