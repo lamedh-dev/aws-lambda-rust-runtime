@@ -93,7 +93,7 @@ mod endpoint_tests {
     }
 
     #[instrument(skip(io, rx))]
-    async fn handle<I>(io: I, rx: oneshot::Receiver<()>) -> Result<(), hyper::error::Error>
+    async fn handle<I>(io: I, rx: oneshot::Receiver<()>) -> Result<(), hyper::Error>
     where
         I: AsyncRead + AsyncWrite + Unpin + 'static,
     {

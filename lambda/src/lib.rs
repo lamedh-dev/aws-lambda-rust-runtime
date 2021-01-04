@@ -41,6 +41,8 @@
 //! [Tokio]: https://docs.rs/tokio/
 pub use crate::types::Context;
 use client::Client;
+use futures_core::stream::Stream;
+use futures_util::stream::StreamExt;
 pub use netlify_lambda_attributes::lambda;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -48,7 +50,6 @@ use std::{
     env, fmt,
     future::Future,
 };
-use tokio::stream::{Stream, StreamExt};
 use tracing::trace;
 
 mod client;
