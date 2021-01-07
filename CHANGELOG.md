@@ -1,3 +1,13 @@
+# 0.2.0
+
+## Features
+
+- Tokio 1.0 support (https://github.com/netlify/aws-lambda-rust-runtime/pull/8)
+
+## Bug Fixes
+
+- HTTP deserialization fixed for Invoke requests (https://github.com/netlify/aws-lambda-rust-runtime/pull/12)
+
 # 0.1.1
 
 - Fix types to work with the AWS Runtime Emulator

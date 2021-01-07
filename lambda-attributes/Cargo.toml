@@ -1,6 +1,6 @@
 [package]
 name = "netlify_lambda_attributes"
-version = "0.1.1"
+version = "0.2.0"
 authors = [
     "David Barsky <dbarsky@amazon.com>",
     "David Calavera <david@netlify.com>",
