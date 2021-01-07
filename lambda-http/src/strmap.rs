@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use serde::{
     de::{MapAccess, Visitor},
     Deserialize, Deserializer,
@@ -55,6 +56,12 @@ impl Clone for StrMap {
 impl From<HashMap<String, Vec<String>>> for StrMap {
     fn from(inner: HashMap<String, Vec<String>>) -> Self {
         StrMap(Arc::new(inner))
+    }
+}
+
+impl From<HashMap<String, String>> for StrMap {
+    fn from(inner: HashMap<String, String>) -> Self {
+        StrMap(Arc::new(inner.into_iter().into_group_map()))
     }
 }
 

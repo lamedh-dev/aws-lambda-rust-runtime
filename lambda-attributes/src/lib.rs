@@ -17,9 +17,17 @@ use quote::quote_spanned;
 use syn::{spanned::Spanned, AttributeArgs, FnArg, ItemFn, Meta, NestedMeta};
 
 /// Return true if attribute macro args declares http flavor in the form `#[lambda(http)]`
-fn is_http(args: AttributeArgs) -> bool {
+fn is_http(args: &AttributeArgs) -> bool {
     args.iter().any(|arg| match arg {
         NestedMeta::Meta(Meta::Path(path)) => path.is_ident("http"),
+        _ => false,
+    })
+}
+
+/// Return true if attribute macro args declares http flavor in the form `#[lambda(http::invoke)]`
+fn is_http_invoke(args: &AttributeArgs) -> bool {
+    args.iter().any(|arg| match arg {
+        NestedMeta::Meta(Meta::Path(path)) => path.is_ident("http::invoke"),
         _ => false,
     })
 }
@@ -75,7 +83,7 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
             let context_name = &context.pat;
             let context_type = &context.ty;
 
-            if is_http(args) {
+            if is_http(&args) {
                 quote_spanned! { input.span() =>
 
                     #(#attrs)*
@@ -83,6 +91,17 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
                         async fn actual(#event_name: #event_type, #context_name: #context_type) #ret #body
 
                         let f = netlify_lambda_http::handler(actual);
+                        netlify_lambda_http::lambda::run(f).await.unwrap();
+                    }
+                }
+            } else if is_http_invoke(&args) {
+                quote_spanned! { input.span() =>
+
+                    #(#attrs)*
+                    #asyncness fn main() {
+                        async fn actual(#event_name: #event_type, #context_name: #context_type) #ret #body
+
+                        let f = netlify_lambda_http::proxy_handler(actual);
                         netlify_lambda_http::lambda::run(f).await.unwrap();
                     }
                 }
