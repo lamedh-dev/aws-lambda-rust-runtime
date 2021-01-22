@@ -14,7 +14,7 @@
 //!    the [Tokio] crate.
 //!
 //! 2. A type that conforms to the [`Handler`] trait. This type can then be passed
-//!    to the the `netlify_lambda::run` function, which launches and runs the Lambda runtime.
+//!    to the the `lamedh_runtime::run` function, which launches and runs the Lambda runtime.
 //!
 //! An asynchronous function annotated with the `#[lambda]` attribute must
 //! accept an argument of type `A` which implements [`serde::Deserialize`], a [`lambda::Context`] and
@@ -22,10 +22,8 @@
 //! any type that implements `Into<Box<dyn std::error::Error + Send + Sync + 'static>>`.
 //!
 //! ```no_run
-//! use netlify_lambda::{lambda, Context};
+//! use lamedh_runtime::{lambda, Context, Error};
 //! use serde_json::Value;
-//!
-//! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
 //! #[lambda]
 //! #[tokio::main]
@@ -43,7 +41,7 @@ pub use crate::types::Context;
 use client::Client;
 use futures_core::stream::Stream;
 use futures_util::stream::StreamExt;
-pub use netlify_lambda_attributes::lambda;
+pub use lamedh_attributes::lambda;
 use serde::{Deserialize, Serialize};
 use std::{
     convert::{TryFrom, TryInto},
@@ -66,7 +64,7 @@ static DEFAULT_LOG_GROUP: &str = "/aws/lambda/Functions";
 static DEFAULT_LOG_STREAM: &str = "$LATEST";
 
 /// Error type that lambdas may result in
-pub(crate) type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
+pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// Configuration derived from environment variables.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -143,15 +141,13 @@ where
 ///
 /// # Example
 /// ```no_run
-/// use netlify_lambda::{handler_fn, Context};
+/// use lamedh_runtime::{handler_fn, Context, Error};
 /// use serde_json::Value;
-///
-/// type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Error> {
 ///     let func = handler_fn(func);
-///     netlify_lambda::run(func).await?;
+///     lamedh_runtime::run(func).await?;
 ///     Ok(())
 /// }
 ///

@@ -1,12 +1,9 @@
-use netlify_lambda::{handler_fn, Context};
+use lamedh_runtime::{handler_fn, run, Context, Error};
 use serde_json::{json, Value};
-
-type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let func = handler_fn(func);
-    netlify_lambda::run(func).await?;
+    run(handler_fn(func)).await?;
     Ok(())
 }
 

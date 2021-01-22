@@ -90,8 +90,8 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #asyncness fn main() {
                         async fn actual(#event_name: #event_type, #context_name: #context_type) #ret #body
 
-                        let f = netlify_lambda_http::handler(actual);
-                        netlify_lambda_http::lambda::run(f).await.unwrap();
+                        let f = lamedh_http::handler(actual);
+                        lamedh_http::lambda::run(f).await.unwrap();
                     }
                 }
             } else if is_http_invoke(&args) {
@@ -101,8 +101,8 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #asyncness fn main() {
                         async fn actual(#event_name: #event_type, #context_name: #context_type) #ret #body
 
-                        let f = netlify_lambda_http::proxy_handler(actual);
-                        netlify_lambda_http::lambda::run(f).await.unwrap();
+                        let f = lamedh_http::proxy_handler(actual);
+                        lamedh_http::lambda::run(f).await.unwrap();
                     }
                 }
             } else {
@@ -112,8 +112,8 @@ pub fn lambda(attr: TokenStream, item: TokenStream) -> TokenStream {
                     #asyncness fn main() {
                         async fn actual(#event_name: #event_type, #context_name: #context_type) #ret #body
 
-                        let f = netlify_lambda::handler_fn(actual);
-                        netlify_lambda::run(f).await.unwrap();
+                        let f = lamedh_runtime::handler_fn(actual);
+                        lamedh_runtime::run(f).await.unwrap();
                     }
                 }
             }

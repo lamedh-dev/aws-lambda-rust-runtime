@@ -1,11 +1,8 @@
 /// See https://github.com/awslabs/aws-lambda-rust-runtime for more info on Rust runtime for AWS Lambda
-use netlify_lambda::{handler_fn, Context};
+use lamedh_runtime::{handler_fn, run, Context, Error};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::fs::File;
-
-/// A shorthand for `Box<dyn std::error::Error + Send + Sync + 'static>` type required by aws-lambda-rust-runtime.
-pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// A simple Lambda request structure with just one field
 /// that tells the Lambda what is expected of it.
@@ -62,8 +59,7 @@ async fn main() -> Result<(), Error> {
         .init();
 
     // call the actual handler of the request
-    let func = handler_fn(func);
-    netlify_lambda::run(func).await?;
+    run(handler_fn(func)).await?;
     Ok(())
 }
 

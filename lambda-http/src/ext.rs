@@ -66,11 +66,9 @@ impl Error for PayloadError {
 /// as well as `{"x":1, "y":2}` respectively.
 ///
 /// ```rust,no_run
-/// use netlify_lambda_http::{handler, lambda::{self, Context}, IntoResponse, Request, Response, RequestExt};
+/// use lamedh_http::{handler, lambda::{self, Context, Error}, IntoResponse, Request, Response, RequestExt};
 /// use aws_lambda_events::encodings::Body;
 /// use serde::Deserialize;
-///
-/// type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 ///
 /// #[derive(Debug,Deserialize,Default)]
 /// struct Args {
@@ -82,7 +80,7 @@ impl Error for PayloadError {
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Error> {
-///   netlify_lambda::run(handler(add)).await?;
+///   lamedh_runtime::run(handler(add)).await?;
 ///   Ok(())
 /// }
 ///

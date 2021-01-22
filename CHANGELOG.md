@@ -1,3 +1,10 @@
+# 0.3.0
+
+## Features
+
+- Export basic Error type
+- Crates rename to be company agnostic
+
 # 0.2.0
 
 ## Features

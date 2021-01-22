@@ -239,7 +239,7 @@ pub(crate) fn into_alb_request(alb: AlbTargetGroupRequest) -> http::Request<Body
 /// # Example
 ///
 /// ```rust,no_run
-/// use netlify_lambda_http::request::from_reader;
+/// use lamedh_http::request::from_reader;
 /// use std::fs::File;
 /// use std::error::Error;
 ///
@@ -262,7 +262,7 @@ where
 /// # Example
 ///
 /// ```rust,no_run
-/// use netlify_lambda_http::request::from_str;
+/// use lamedh_http::request::from_str;
 /// use std::fs::File;
 /// use std::error::Error;
 ///
