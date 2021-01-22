@@ -1,6 +1,6 @@
 [package]
 name = "lamedh_attributes"
-version = "0.2.0"
+version = "0.3.0"
 authors = [
     "David Barsky <dbarsky@amazon.com>",
     "David Calavera <david.calavera@gmail.com>",
