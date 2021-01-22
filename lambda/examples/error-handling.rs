@@ -1,5 +1,5 @@
 /// See https://github.com/awslabs/aws-lambda-rust-runtime for more info on Rust runtime for AWS Lambda
-use netlify_lambda::{handler_fn, Context};
+use lamedh_runtime::{handler_fn, run, Context};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::fs::File;
@@ -62,8 +62,7 @@ async fn main() -> Result<(), Error> {
         .init();
 
     // call the actual handler of the request
-    let func = handler_fn(func);
-    netlify_lambda::run(func).await?;
+    run(handler_fn(func)).await?;
     Ok(())
 }
 

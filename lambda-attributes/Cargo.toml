@@ -1,17 +1,17 @@
 [package]
-name = "netlify_lambda_attributes"
+name = "lamedh_attributes"
 version = "0.2.0"
 authors = [
     "David Barsky <dbarsky@amazon.com>",
-    "David Calavera <david@netlify.com>",
+    "David Calavera <david.calavera@gmail.com>",
 ]
 edition = "2018"
 license = "Apache-2.0"
-repository = "https://github.com/netlify/aws-lambda-rust-runtime"
+repository = "https://github.com/lamedh-dev/aws-lambda-rust-runtime"
 readme = "../README.md"
 description = "Lambda macro attributes"
 keywords = ["AWS", "Lambda"]
-documentation = "https://rs-lambda-runtime.netlify.engineering/netlify_lambda_attributes"
+documentation = "https://rs-lambda-runtime.netlify.engineering/lamedh_attributes"
 
 [lib]
 proc-macro = true

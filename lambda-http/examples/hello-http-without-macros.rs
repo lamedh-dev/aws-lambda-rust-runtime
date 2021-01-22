@@ -1,10 +1,10 @@
-use netlify_lambda_http::{handler, lambda::Context, IntoResponse, Request, RequestExt, Response};
+use lamedh_http::{handler, lambda::Context, IntoResponse, Request, RequestExt, Response};
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    netlify_lambda::run(handler(func)).await?;
+    lamedh_runtime::run(handler(func)).await?;
     Ok(())
 }
 

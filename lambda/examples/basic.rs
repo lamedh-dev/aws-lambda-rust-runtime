@@ -1,7 +1,7 @@
 // This example requires the following input to succeed:
 // { "command": "do something" }
 
-use netlify_lambda::{handler_fn, Context};
+use lamedh_runtime::{handler_fn, run, Context};
 use serde::{Deserialize, Serialize};
 
 /// A shorthand for `Box<dyn std::error::Error + Send + Sync + 'static>`
@@ -29,7 +29,7 @@ struct Response {
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let func = handler_fn(my_handler);
-    netlify_lambda::run(func).await?;
+    run(func).await?;
     Ok(())
 }
 

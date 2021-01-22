@@ -1,4 +1,4 @@
-use netlify_lambda::{lambda, Context};
+use lamedh_runtime::{lambda, Context};
 use serde_json::Value;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;

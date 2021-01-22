@@ -22,7 +22,7 @@
 //! The full body of your `main` function will be executed on **every** invocation of your lambda task.
 //!
 //! ```rust,no_run
-//! use netlify_lambda_http::{
+//! use lamedh_http::{
 //!    lambda::{lambda, Context},
 //!    IntoResponse, Request,
 //! };
@@ -38,11 +38,11 @@
 //! ## Hello World, Without Macros
 //!
 //! For cases where your lambda might benfit from one time function initializiation might
-//! prefer a plain `main` function and invoke `netlify_lambda::run` explicitly in combination with the [`handler`](fn.handler.html) function.
+//! prefer a plain `main` function and invoke `lamedh_runtime::run` explicitly in combination with the [`handler`](fn.handler.html) function.
 //! Depending on the runtime cost of your dependency bootstrapping, this can reduce the overall latency of your functions execution path.
 //!
 //! ```rust,no_run
-//! use netlify_lambda_http::{handler, lambda};
+//! use lamedh_http::{handler, lambda};
 //!
 //! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
@@ -50,7 +50,7 @@
 //! async fn main() -> Result<(), Error> {
 //!     // initialize dependencies once here for the lifetime of your
 //!     // lambda task
-//!     netlify_lambda::run(handler(|request, context| async { Ok("👋 world!") })).await?;
+//!     lamedh_runtime::run(handler(|request, context| async { Ok("👋 world!") })).await?;
 //!     Ok(())
 //! }
 //!
@@ -62,13 +62,13 @@
 //! with the [`RequestExt`](trait.RequestExt.html) trait.
 //!
 //! ```rust,no_run
-//! use netlify_lambda_http::{handler, lambda::{self, Context}, IntoResponse, Request, RequestExt};
+//! use lamedh_http::{handler, lambda::{self, Context}, IntoResponse, Request, RequestExt};
 //!
 //! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Error> {
-//!     netlify_lambda::run(handler(hello)).await?;
+//!     lamedh_runtime::run(handler(hello)).await?;
 //!     Ok(())
 //! }
 //!
@@ -92,9 +92,8 @@
 extern crate maplit;
 
 pub use http::{self, Response};
-use netlify_lambda::Handler as LambdaHandler;
-pub use netlify_lambda::{self as lambda, Context};
-pub use netlify_lambda_attributes::lambda;
+pub use lamedh_attributes::lambda;
+pub use lamedh_runtime::{self as lambda, Context, Handler as LambdaHandler};
 
 use aws_lambda_events::encodings::Body;
 use aws_lambda_events::event::apigw::ApiGatewayProxyRequest;
@@ -170,7 +169,7 @@ where
     }
 }
 
-/// Adapts a [`Handler`](trait.Handler.html) to the `netlify_lambda::run` interface
+/// Adapts a [`Handler`](trait.Handler.html) to the `lamedh_runtime::run` interface
 ///
 /// This is an abstract interface that tries to deserialize the request payload
 /// in any possible [`request::LambdaRequest`] value.
@@ -208,7 +207,7 @@ impl<H: Handler> LambdaHandler<LambdaRequest, LambdaResponse> for Adapter<H> {
     }
 }
 
-/// Adapts a [`Handler`](trait.Handler.html) to the `netlify_lambda::run` interface
+/// Adapts a [`Handler`](trait.Handler.html) to the `lamedh_runtime::run` interface
 ///
 /// This is a concrete interface that tries to deserialize the request payload
 /// into an AWS API Gateway Proxy definition. This definition is the same that the

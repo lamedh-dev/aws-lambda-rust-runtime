@@ -4,6 +4,6 @@ publish = "_netlify_out"
 
 [[redirects]]
 from = "/"
-to = "/netlify_lambda_http/"
+to = "/lamedh_http/"
 status = 301
 force = true
