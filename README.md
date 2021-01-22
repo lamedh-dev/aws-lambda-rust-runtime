@@ -21,10 +21,8 @@ This is a fork for the official AWS Lambda runtime for Rust. We've created this 
 The code below creates a simple function that receives an event with a `firstName` field and returns a message to the caller. Notice: this crate is tested against latest stable Rust.
 
 ```rust,no_run
-use lamedh_runtime::{Context, handler_fn, run};
+use lamedh_runtime::{Context, handler_fn, run, Error};
 use serde_json::{json, Value};
-
-type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {

@@ -22,10 +22,8 @@
 //! any type that implements `Into<Box<dyn std::error::Error + Send + Sync + 'static>>`.
 //!
 //! ```no_run
-//! use lamedh_runtime::{lambda, Context};
+//! use lamedh_runtime::{lambda, Context, Error};
 //! use serde_json::Value;
-//!
-//! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
 //! #[lambda]
 //! #[tokio::main]
@@ -66,7 +64,7 @@ static DEFAULT_LOG_GROUP: &str = "/aws/lambda/Functions";
 static DEFAULT_LOG_STREAM: &str = "$LATEST";
 
 /// Error type that lambdas may result in
-pub(crate) type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
+pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// Configuration derived from environment variables.
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -143,10 +141,8 @@ where
 ///
 /// # Example
 /// ```no_run
-/// use lamedh_runtime::{handler_fn, Context};
+/// use lamedh_runtime::{handler_fn, Context, Error};
 /// use serde_json::Value;
-///
-/// type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 ///
 /// #[tokio::main]
 /// async fn main() -> Result<(), Error> {

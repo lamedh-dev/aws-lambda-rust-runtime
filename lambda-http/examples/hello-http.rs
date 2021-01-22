@@ -1,9 +1,7 @@
 use lamedh_http::{
-    lambda::{lambda, Context},
+    lambda::{lambda, Context, Error},
     IntoResponse, Request,
 };
-
-type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 #[lambda(http)]
 #[tokio::main]

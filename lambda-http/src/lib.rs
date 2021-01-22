@@ -23,10 +23,9 @@
 //!
 //! ```rust,no_run
 //! use lamedh_http::{
-//!    lambda::{lambda, Context},
+//!    lambda::{lambda, Context, Error},
 //!    IntoResponse, Request,
 //! };
-//! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 //!
 //! #[lambda(http)]
 //! #[tokio::main]
@@ -42,9 +41,7 @@
 //! Depending on the runtime cost of your dependency bootstrapping, this can reduce the overall latency of your functions execution path.
 //!
 //! ```rust,no_run
-//! use lamedh_http::{handler, lambda};
-//!
-//! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
+//! use lamedh_http::{handler, lambda::{self, Error}};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Error> {
@@ -62,9 +59,7 @@
 //! with the [`RequestExt`](trait.RequestExt.html) trait.
 //!
 //! ```rust,no_run
-//! use lamedh_http::{handler, lambda::{self, Context}, IntoResponse, Request, RequestExt};
-//!
-//! type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
+//! use lamedh_http::{handler, lambda::{self, Context, Error}, IntoResponse, Request, RequestExt};
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Error> {
@@ -93,7 +88,7 @@ extern crate maplit;
 
 pub use http::{self, Response};
 pub use lamedh_attributes::lambda;
-pub use lamedh_runtime::{self as lambda, Context, Handler as LambdaHandler};
+pub use lamedh_runtime::{self as lambda, Context, Error, Handler as LambdaHandler};
 
 use aws_lambda_events::encodings::Body;
 use aws_lambda_events::event::apigw::ApiGatewayProxyRequest;
@@ -112,9 +107,6 @@ use std::{
     pin::Pin,
     task::{Context as TaskContext, Poll},
 };
-
-/// Error type that lambdas may result in
-pub(crate) type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// Type alias for `http::Request`s with a fixed [`Body`](enum.Body.html) type
 pub type Request = http::Request<Body>;

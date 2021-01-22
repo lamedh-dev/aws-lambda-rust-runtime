@@ -1,12 +1,8 @@
 // This example requires the following input to succeed:
 // { "command": "do something" }
 
-use lamedh_runtime::{handler_fn, run, Context};
+use lamedh_runtime::{handler_fn, run, Context, Error};
 use serde::{Deserialize, Serialize};
-
-/// A shorthand for `Box<dyn std::error::Error + Send + Sync + 'static>`
-/// type required by aws-lambda-rust-runtime.
-pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// This is also a made-up example. Requests come into the runtime as unicode
 /// strings in json format, which can map to any structure that implements `serde::Deserialize`
