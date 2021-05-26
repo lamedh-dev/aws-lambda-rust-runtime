@@ -220,7 +220,7 @@ where
         let mut ctx: Context = Context::try_from(parts.headers)?;
         ctx.env_config = Config::from_env()?;
         let body = hyper::body::to_bytes(body).await?;
-        let body = serde_json::from_slice(&body)?;
+        let body = serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_slice(&body))?;
 
         let request_id = &ctx.request_id.clone();
         let f = handler.call(body, ctx);
