@@ -1,5 +1,6 @@
 /// See https://github.com/awslabs/aws-lambda-rust-runtime for more info on Rust runtime for AWS Lambda
 use lamedh_runtime::{handler_fn, run, Context, Error};
+use serde::de::IntoDeserializer;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::fs::File;
@@ -66,7 +67,7 @@ async fn main() -> Result<(), Error> {
 /// The actual handler of the Lambda request.
 pub(crate) async fn func(event: Value, ctx: Context) -> Result<Value, Error> {
     // check what action was requested
-    match serde_json::from_value::<Request>(event)?.event_type {
+    match serde_path_to_error::deserialize::<_, Request>(event.into_deserializer())?.event_type {
         EventType::SimpleError => {
             // generate a simple text message error using `simple_error` crate
             return Err(Box::new(simple_error::SimpleError::new("A simple error as requested!")));
