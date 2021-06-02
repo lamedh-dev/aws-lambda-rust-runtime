@@ -230,7 +230,7 @@ where
             Err(e) => EventErrorRequest {
                 request_id,
                 diagnostic: Diagnostic {
-                    error_message: format!("{:?}", e),
+                    error_message: e.to_string(),
                     error_type: type_name_of_val(e).to_owned(),
                 },
             }
