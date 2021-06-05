@@ -158,7 +158,7 @@ where
 pub async fn run<A, B, F>(handler: F) -> Result<(), Error>
 where
     F: Handler<A, B>,
-    <F as Handler<A, B>>::Error: fmt::Debug,
+    <F as Handler<A, B>>::Error: fmt::Display,
     A: for<'de> Deserialize<'de>,
     B: Serialize,
 {
@@ -177,7 +177,7 @@ where
 pub async fn run_simulated<A, B, F>(handler: F, url: &str) -> Result<(), Error>
 where
     F: Handler<A, B>,
-    <F as Handler<A, B>>::Error: fmt::Debug,
+    <F as Handler<A, B>>::Error: fmt::Display,
     A: for<'de> Deserialize<'de>,
     B: Serialize,
 {
@@ -207,7 +207,7 @@ async fn run_inner<A, B, F>(
 ) -> Result<(), Error>
 where
     F: Handler<A, B>,
-    <F as Handler<A, B>>::Error: fmt::Debug,
+    <F as Handler<A, B>>::Error: fmt::Display,
     A: for<'de> Deserialize<'de>,
     B: Serialize,
 {
@@ -230,7 +230,7 @@ where
             Err(e) => EventErrorRequest {
                 request_id,
                 diagnostic: Diagnostic {
-                    error_message: format!("{:?}", e),
+                    error_message: e.to_string(),
                     error_type: type_name_of_val(e).to_owned(),
                 },
             }
